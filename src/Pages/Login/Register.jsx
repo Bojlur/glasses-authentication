@@ -1,28 +1,28 @@
 
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import SocialLogin from './SocialLogin';
 import useAuth from '../../hooks/useAuth';
 
 const Register = () => {
 
-    const { createUser } = useAuth();
-    const { register, handleSubmit, formState: { errors }, } = useForm()
+    const { createUser, updateUserProfile } = useAuth();
+    const { register, handleSubmit, formState: { errors }, } = useForm();
 
     //navigation systems
     const navigate = useNavigate();
-    const location = useLocation();
-    const from = location?.state || '/';
+    const from = '/';
     
       const onSubmit = (data) => {
-        const {email, password} = data
+        const {email, password, fullName, image} = data
         createUser(email, password)
-        .then(result => {
-            if(result.user){
-                navigate(from)
-            }
+            .then(() => {
+                updateUserProfile(fullName, image)
+                    .then(() => {    
+                        navigate(from);
+                });     
         });
-      }
+      };
     return (
         <>
             <div className="hero bg-base-200 min-h-screen">

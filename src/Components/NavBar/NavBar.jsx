@@ -50,6 +50,7 @@ const NavBar = () => {
                         <Menus />
                     </ul>
                 </div>
+
                 <div className="navbar-end">
                     {
                         user ? <div className="dropdown dropdown-end">

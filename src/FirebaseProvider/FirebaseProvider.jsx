@@ -1,4 +1,14 @@
-import { createUserWithEmailAndPassword, FacebookAuthProvider, GithubAuthProvider, GoogleAuthProvider, onAuthStateChanged, signInWithEmailAndPassword, signInWithPopup, signOut } from 'firebase/auth';
+import { createUserWithEmailAndPassword,
+             FacebookAuthProvider, 
+             GithubAuthProvider, 
+             GoogleAuthProvider, 
+             onAuthStateChanged, 
+             signInWithEmailAndPassword, 
+             signInWithPopup,
+              signOut, 
+              updateProfile,
+             } from 'firebase/auth';
+
 import React, { createContext, useEffect, useState } from 'react';
 import auth from '../Firebase/firebaseConfig';
 
@@ -11,28 +21,41 @@ const facebookProvider = new FacebookAuthProvider();
 
 const FirebaseProvider = ({children}) => {
     const [user, setUser] = useState(null);
-    console.log(user)
+    const [loading, setLoading] = useState(true);
 
     //create user
     const createUser = (email, password) =>{
+        setLoading(true);
         return createUserWithEmailAndPassword(auth, email, password)
+    }
+
+    //updateUserProfile
+    const updateUserProfile = (name, image) =>{
+        return updateProfile(auth.currentUser, {
+            displayName: name,
+            photoURL: image
+        })
     }
 
     //sign in user
     const signInUser = (email, password) => {
+        setLoading(true);
         return signInWithEmailAndPassword(auth, email, password)
     }
 
     //google login
     const googleLogin = () => {
+        setLoading(true);
         return signInWithPopup(auth, googleProvider)
     }
     //github login
     const githubLogin = () => {
+        setLoading(true);
         return signInWithPopup(auth, githubProvider)
     }
     //facebook login
     const facebookLogin = () => {
+        setLoading(true);
         return signInWithPopup(auth, facebookProvider)
     }
 
@@ -44,11 +67,13 @@ const FirebaseProvider = ({children}) => {
 
     //observer
     useEffect(() => {
-        onAuthStateChanged(auth, (user) => {
+        const unsubscribe = onAuthStateChanged(auth, (user) => {
             if (user) {
               setUser(user)
+              setLoading(false);
             }
           });
+          return () =>unsubscribe();
     },[])
 
 
@@ -58,8 +83,10 @@ const FirebaseProvider = ({children}) => {
         googleLogin,
         githubLogin,
         logout,
+        user,
         facebookLogin,
-        user
+        updateUserProfile,
+        loading
     }
     return ( 
         <AuthContext.Provider value={allValues}>
